@@ -2,7 +2,7 @@
 
 /**
  * This file is part of ScheduledMail plugin for FacturaScripts.
- * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+ * Copyright (C) 2025 Ernesto Serrano <info@ernesto.es>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -35,7 +35,7 @@ use Throwable;
  * actual email data is rebuilt from the persisted record so the work event
  * stays small.
  *
- * @author Ernesto Serrano <erseco@gmail.com>
+ * @author Ernesto Serrano <info@ernesto.es>
  */
 class SendScheduledMailWorker extends WorkerClass
 {
@@ -170,7 +170,7 @@ class SendScheduledMailWorker extends WorkerClass
      * Stores the failure reason and logs it.
      *
      * @param ScheduledMail $mail
-     * @param string $error
+     * @param string        $error
      */
     protected function markFailed(ScheduledMail $mail, string $error): void
     {

@@ -2,7 +2,7 @@
 
 /**
  * This file is part of ScheduledMail plugin for FacturaScripts.
- * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+ * Copyright (C) 2025 Ernesto Serrano <info@ernesto.es>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -30,7 +30,7 @@ use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
  * is no "new" button: a pending email is cancelled by deleting it (the worker
  * then skips the missing record and its files are removed).
  *
- * @author Ernesto Serrano <erseco@gmail.com>
+ * @author Ernesto Serrano <info@ernesto.es>
  */
 class ListScheduledMail extends ListController
 {

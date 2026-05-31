@@ -2,7 +2,7 @@
 
 /**
  * This file is part of ScheduledMail plugin for FacturaScripts.
- * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+ * Copyright (C) 2025 Ernesto Serrano <info@ernesto.es>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,7 +27,7 @@ use FacturaScripts\Core\Lib\ExtendedController\EditController;
  * ListScheduledMail page. Records are created from the SendMail form, so the
  * "new" button is disabled; the record can still be deleted to cancel it.
  *
- * @author Ernesto Serrano <erseco@gmail.com>
+ * @author Ernesto Serrano <info@ernesto.es>
  */
 class EditScheduledMail extends EditController
 {

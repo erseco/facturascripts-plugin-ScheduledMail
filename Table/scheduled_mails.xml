@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     This file is part of ScheduledMail plugin for FacturaScripts.
-    Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+    Copyright (C) 2025 Ernesto Serrano <info@ernesto.es>
 
     Table that stores scheduled (pending) emails until the work queue delivers
     them. It is NOT a sent-history table (that is the core emails_sent table).

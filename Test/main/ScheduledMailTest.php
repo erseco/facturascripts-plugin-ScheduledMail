@@ -2,7 +2,7 @@
 
 /**
  * This file is part of ScheduledMail plugin for FacturaScripts.
- * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+ * Copyright (C) 2025 Ernesto Serrano <info@ernesto.es>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
  *
  * These are lightweight tests that do not require a database connection.
  *
- * @author Ernesto Serrano <erseco@gmail.com>
+ * @author Ernesto Serrano <info@ernesto.es>
  */
 final class ScheduledMailTest extends TestCase
 {
@@ -66,5 +66,23 @@ final class ScheduledMailTest extends TestCase
         $model->setAttachments([]);
         $this->assertNull($model->attachments_json);
         $this->assertSame([], $model->getAttachments());
+    }
+
+    public function testGetAttachmentsWithMalformedJson(): void
+    {
+        $model = new ScheduledMail();
+        $model->attachments_json = 'not-json';
+        $this->assertSame([], $model->getAttachments());
+    }
+
+    public function testClearSetsPendingDefaults(): void
+    {
+        $model = new ScheduledMail();
+        $model->status = ScheduledMail::STATUS_SENT;
+        $model->reply_to = true;
+        $model->clear();
+        $this->assertSame(ScheduledMail::STATUS_PENDING, $model->status);
+        $this->assertFalse($model->reply_to);
+        $this->assertNotEmpty($model->creation_date);
     }
 }

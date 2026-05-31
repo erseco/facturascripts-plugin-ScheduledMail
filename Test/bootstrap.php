@@ -2,7 +2,7 @@
 
 /**
  * This file is part of ScheduledMail plugin for FacturaScripts.
- * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+ * Copyright (C) 2025 Ernesto Serrano <info@ernesto.es>
  *
  * PHPUnit bootstrap file for testing
  */

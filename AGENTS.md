@@ -83,3 +83,49 @@ make format   # PHP CS Fixer – auto-fix style
 make lint     # PHPCS – must be clean
 make test     # PHPUnit – all tests must pass
 ```
+
+Unit tests live in `Test/main/`. Keep the scheduling rules covered by
+`ScheduleValidatorTest` (the 30-day window / past / future logic lives in the
+pure `Lib/ScheduleValidator` class precisely so it can be unit-tested without a
+running FacturaScripts).
+
+## End-to-end validation (scheduled invoice email with attachment)
+
+The unit tests cannot exercise the controller → work queue → SMTP path. To
+validate the full flow manually (this is exactly how it was verified), the dev
+`docker-compose.yml` already bundles **Mailpit** (a local SMTP sink) and enables
+cron:
+
+1. `make up` — starts FacturaScripts (`:8080`), MariaDB and Mailpit (`:8025`).
+2. Log in at <http://localhost:8080> (admin/admin) and enable **ScheduledMail**
+   in **Admin → Plugins** (then **Reconstruir** if the SendMail field does not
+   appear yet). Quick alternative from the host:
+   `docker compose exec -T facturascripts php -r '...Plugins::enable("ScheduledMail")...'`.
+3. **Admin → Email** (`/ConfigEmail`): set `host=mailpit`, `port=1025`, a
+   `from` address, no encryption, no user/password. Use the **Test** button or
+   send any email and confirm it appears in Mailpit at <http://localhost:8025>.
+4. Create a sales invoice (customer + a line) and open it. From the **Imprimir**
+   dropdown choose **Email** — FacturaScripts generates the PDF and opens the
+   SendMail form with the PDF attached and the customer pre-filled.
+5. Pick a near-future date/time in **Programar envío** and submit. Expect
+   "Email programado correctamente" (it must NOT send immediately).
+6. Verify the pending state:
+   - `scheduled_mails` row is `pending` with `model_class_name=FacturaCliente`,
+     the right `model_code` and an `attachments_json` entry.
+   - the PDF was copied to `MyFiles/ScheduledMail/<id>/`.
+   - the invoice `femail` is still NULL.
+7. Run the work queue once: `make cron` (the container also runs it hourly).
+8. Verify delivery:
+   - Mailpit shows the email **with 1 attachment** (the invoice PDF).
+   - the `scheduled_mails` row is `sent` with `sent_at` set.
+   - the invoice `femail` is now set (marked emailed only after delivery).
+   - `MyFiles/ScheduledMail/<id>/` was removed.
+
+Useful host-side checks during validation:
+
+```bash
+make cron                                              # process the queue now
+curl -s http://localhost:8025/api/v1/messages          # Mailpit inbox (JSON)
+docker compose exec -T mariadb mariadb -ufacturascripts -pfacturascripts \
+  facturascripts -e "SELECT id,status,sent_at FROM scheduled_mails;"
+```

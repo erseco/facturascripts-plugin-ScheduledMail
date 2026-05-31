@@ -2,7 +2,7 @@
 
 /**
  * This file is part of ScheduledMail plugin for FacturaScripts.
- * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+ * Copyright (C) 2025 Ernesto Serrano <info@ernesto.es>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,6 +26,7 @@ use FacturaScripts\Core\Validator;
 use FacturaScripts\Core\WorkQueue;
 use FacturaScripts\Dinamic\Lib\Email\NewMail;
 use FacturaScripts\Plugins\ScheduledMail\Init;
+use FacturaScripts\Plugins\ScheduledMail\Lib\ScheduleValidator;
 use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
 
 /**
@@ -42,15 +43,12 @@ use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
  * and a delayed work queue event is registered. The email is delivered later
  * by SendScheduledMailWorker when the work queue runs (cron).
  *
- * @author Ernesto Serrano <erseco@gmail.com>
+ * @author Ernesto Serrano <info@ernesto.es>
  */
 class SendMail extends ParentController
 {
     /** Name of the optional datetime field added to the SendMail form. */
     public const SCHEDULE_FIELD = 'email-scheduled-at';
-
-    /** Maximum scheduling window in seconds (30 days). */
-    public const MAX_SCHEDULE_SECONDS = 2592000;
 
     /**
      * Intercepts the send action only when a schedule date is provided.
@@ -112,24 +110,13 @@ class SendMail extends ParentController
      */
     protected function parseScheduleDate(string $scheduledInput): ?int
     {
-        $timestamp = strtotime($scheduledInput);
-        if (false === $timestamp) {
-            Tools::log()->error('scheduled-date-invalid');
+        $result = ScheduleValidator::parse($scheduledInput, time());
+        if ($result['error'] !== ScheduleValidator::OK) {
+            Tools::log()->error($result['error']);
             return null;
         }
 
-        $now = time();
-        if ($timestamp <= $now) {
-            Tools::log()->error('scheduled-date-in-past');
-            return null;
-        }
-
-        if ($timestamp - $now > self::MAX_SCHEDULE_SECONDS) {
-            Tools::log()->error('scheduled-date-too-far');
-            return null;
-        }
-
-        return $timestamp;
+        return $result['timestamp'];
     }
 
     /**
