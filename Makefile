@@ -1,6 +1,6 @@
 # Makefile to facilitate the use of Docker for FacturaScripts plugin development
 
-.PHONY: help up upd down pull build shell clean package enable-plugin rebuild lint format test logs ps fresh check-docker
+.PHONY: help up upd down pull build shell clean package enable-plugin rebuild cron lint format test logs ps fresh check-docker
 
 # Define SED_INPLACE based on the operating system
 ifeq ($(shell uname), Darwin)
@@ -96,6 +96,13 @@ rebuild: check-docker
 	@echo "Rebuilding FacturaScripts..."
 	@docker compose exec facturascripts sh -c "curl -s http://localhost:8080/deploy?action=rebuild > /dev/null"
 	@echo "Rebuild complete!"
+
+# Run the FacturaScripts work queue once (delivers due scheduled emails now).
+# The container also runs this hourly; use this to process the queue on demand.
+cron: check-docker
+	@echo "Running the FacturaScripts work queue..."
+	@docker compose exec facturascripts sh -c "cd /var/www/html && php84 index.php -cron"
+	@echo "Work queue processed. Check Mailpit at http://localhost:8025"
 
 # Run PHP CodeSniffer to check code style
 lint: check-docker upd

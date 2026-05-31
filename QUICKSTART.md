@@ -42,9 +42,16 @@ email FacturaScripts sends.
   - **Encryption:** none
 
 Now open any invoice → **Send email**, pick a future date in **Schedule send**, and
-submit. Cron is enabled (`RUN_CRON_TASKS: "true"`), so when the time arrives the work
-queue delivers the email and it appears in Mailpit. Review scheduled emails in
-**Admin Panel → Scheduled emails**.
+submit. Review scheduled emails in **Admin Panel → Scheduled emails**.
+
+Cron is enabled (`RUN_CRON_TASKS: "true"`), but the container runs the work queue only
+**once an hour**. To deliver due scheduled emails immediately, run:
+
+```bash
+make cron
+```
+
+The delivered email then appears in Mailpit at <http://localhost:8025>.
 
 ## 5. Make Changes
 
