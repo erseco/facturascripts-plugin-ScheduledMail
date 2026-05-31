@@ -38,13 +38,11 @@ jobs:
           git archive --format=zip --prefix=ScheduledMail/ HEAD -o ScheduledMail-${{ steps.version.outputs.VERSION }}.zip
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ScheduledMail-${{ steps.version.outputs.VERSION }}.zip
           generate_release_notes: true
 
-      # When forking this template, update plugin-slug to the slug your
-      # plugin is registered under on https://facturascripts.com/forja.
       - name: Publish to FacturaScripts forja
         uses: erseco/action-facturascripts-publicar-forja@v1
         with:

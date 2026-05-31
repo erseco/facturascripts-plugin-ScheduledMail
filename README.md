@@ -1,133 +1,107 @@
-# ScheduledMail for FacturaScripts
+# ScheduledMail para FacturaScripts
 
-Schedule email delivery from the standard FacturaScripts **SendMail** form. Pick an
-optional future date/time and the email is queued and delivered later by the native
-FacturaScripts work queue (cron) instead of being sent immediately.
+<a href="https://erseco.github.io/facturascripts-playground/?blueprint=https%3A%2F%2Fraw.githubusercontent.com%2Ferseco%2Ffacturascripts-plugin-ScheduledMail%2Frefs%2Fheads%2Fmain%2Fblueprint.json">
+  <img src="https://raw.githubusercontent.com/erseco/facturascripts-playground/main/ogimage.png" alt="Prueba ScheduledMail en tu navegador" width="220">
+</a><br>
+<small><a href="https://erseco.github.io/facturascripts-playground/?blueprint=https%3A%2F%2Fraw.githubusercontent.com%2Ferseco%2Ffacturascripts-plugin-ScheduledMail%2Frefs%2Fheads%2Fmain%2Fblueprint.json">Pruébalo en tu navegador</a></small>
 
-If you leave the schedule field empty, nothing changes: the email is sent right away
-through the usual FacturaScripts flow.
+Programa el envío de emails desde el formulario de envío habitual de FacturaScripts. Elige una fecha y hora futura y el email se encola y se entrega más tarde mediante la cola de trabajos nativa (cron), en lugar de enviarse al instante.
 
-## Features
+Si dejas el campo vacío, no cambia nada: el email se envía inmediatamente con el flujo de siempre.
 
-- Adds an optional **Schedule send** date/time field to the existing SendMail form.
-- Empty field → immediate send (unchanged behaviour).
-- Future date/time → the email is persisted and delivered by the work queue.
-- Hard limit of **30 days**, enforced **server-side** (and client-side for convenience).
-- The send button turns into a differently-coloured **Schedule send** button with a clock
-  icon when a valid future date is selected, making the scheduled mode obvious.
-- Attachments (the generated document PDF and any uploaded files) are copied to a
-  plugin-owned folder so they survive until delivery.
-- A management page (**Scheduled emails**) lists every scheduled email with its status and
-  lets you cancel pending ones.
-- Reuses the core `NewMail`, `WorkQueue` and cron infrastructure — no custom mailer or
-  cron runner.
+## Cómo funciona
 
-## Requirements
+El plugin añade un campo opcional **Programar envío** al formulario de envío de email (`SendMail`). Al elegir una fecha futura válida, el botón de enviar se transforma en un botón **Programar envío** de otro color y con un icono de reloj, dejando claro que el correo no se enviará en ese momento.
 
-- FacturaScripts **2025** or later (uses `WorkQueue::sendFuture()`).
-- PHP **8.1** or later.
-- **Cron / work queue must be configured and running.** Scheduled emails are delivered by
-  the FacturaScripts work queue, which is processed by the cron task. If cron is not
-  running, scheduled emails stay `pending` and are never sent.
-  See the FacturaScripts documentation on how to configure the cron:
-  typically a system cron entry that calls `Cron` periodically, e.g.
+El email programado se guarda, sus adjuntos se copian a una carpeta propia del plugin y se registra un evento retardado con `WorkQueue::sendFuture()`. Cuando llega el momento y la cola de trabajos se ejecuta (cron), un *worker* reconstruye el email con las clases nativas (`NewMail`) y lo envía. El documento relacionado se marca como enviado solo tras la entrega correcta.
+
+<p align="center">
+  <img src=".github/screenshot.png" alt="Formulario de envío con el campo Programar envío" width="700">
+</p>
+
+## Características
+
+- **Campo de programación opcional** en el formulario de envío estándar.
+- **Sin cambios si está vacío**: envío inmediato como hasta ahora.
+- **Fecha futura**: el email se programa y lo entrega la cola de trabajos.
+- **Límite de 30 días**, validado en el **servidor** (y también en el cliente).
+- **Botón dinámico**: cambia de color, icono (reloj) y texto al activar el modo programado.
+- **Adjuntos persistentes**: el PDF del documento y los archivos subidos se copian a
+  `MyFiles/ScheduledMail/<id>/` para que sigan disponibles hasta el envío.
+- **Pantalla de gestión** (*Emails programados*) con estados y opción de cancelar los pendientes.
+- **Reutiliza el núcleo**: `NewMail`, `WorkQueue` y el cron de FacturaScripts; no añade ni un
+  mailer ni un cron propios.
+- **Compatibilidad**: FacturaScripts 2025 y PHP 8.1 o superior.
+
+## Uso
+
+1. Abre cualquier documento (por ejemplo una factura) y pulsa **Enviar email**.
+2. Redacta o revisa el email como siempre.
+3. Opcionalmente, elige una fecha y hora en **Programar envío**:
+   - Déjalo vacío para enviar inmediatamente.
+   - Elige una fecha futura (hasta 30 días) para programarlo. El botón pasa a **Programar envío**.
+4. Envía. Un email programado muestra una confirmación y **no** se envía en ese momento.
+5. Cuando llega la hora y se ejecuta la cola de trabajos, el email se entrega y el documento
+   relacionado se marca como enviado (`femail`).
+
+Puedes revisar y cancelar los envíos en **Panel de Admin > Emails programados**.
+
+## Instalación
+
+1. Descarga el ZIP desde [Releases](../../releases/latest).
+2. Ve a **Panel de Admin > Plugins** en FacturaScripts.
+3. Sube el archivo ZIP y activa el plugin. La tabla `scheduled_mails` se crea automáticamente.
+4. Asegúrate de tener configurado el **SMTP** (Admin > Email). El plugin usa la misma
+   configuración de email que el envío normal.
+
+## Requisitos
+
+- FacturaScripts **2025** o superior (usa `WorkQueue::sendFuture()`).
+- PHP **8.1** o superior.
+- **El cron / la cola de trabajos debe estar configurado y en ejecución.** Los emails
+  programados los entrega la cola de trabajos, que procesa el cron. Si el cron no se ejecuta,
+  los emails quedan en estado `pending` y no se envían. Por ejemplo:
 
   ```
-  */5 * * * * cd /path/to/facturascripts && php cron.php
+  */5 * * * * cd /ruta/a/facturascripts && php cron.php
   ```
 
-## Installation
+## Zona horaria
 
-1. Download the plugin ZIP (from the releases page or build it with `make package VERSION=1`).
-2. In FacturaScripts go to **Admin Panel → Plugins** and upload/enable **ScheduledMail**.
-3. FacturaScripts creates the `scheduled_mails` table automatically.
-4. Make sure your **SMTP settings** are configured (Admin → Email). The plugin uses the
-   same email configuration as the normal SendMail form.
+La fecha/hora que eliges se interpreta en la **zona horaria de la aplicación/servidor**
+(`FS_TIMEZONE`), que es la que usa FacturaScripts internamente (`Tools::dateTime()`). El límite
+de 30 días y la comprobación de «debe ser futura» se validan en el servidor contra el reloj del
+servidor.
 
-## Usage
+## Adjuntos
 
-1. Open any document (e.g. an invoice) and click **Send email**.
-2. Write/review the email as usual.
-3. Optionally pick a date/time in **Schedule send**:
-   - Leave it empty to send immediately.
-   - Choose a future date/time (up to 30 days ahead) to schedule it. The send button turns
-     into **Schedule send**.
-4. Submit. A scheduled email shows a confirmation and is **not** sent immediately.
-5. When the scheduled moment arrives and the work queue runs, the email is delivered and
-   the related document is marked as emailed (`femail`).
+Para que la programación sea segura hasta 30 días, el plugin **copia** el PDF del documento y los
+archivos subidos a `MyFiles/ScheduledMail/<id>/` al programar el email. La carpeta se elimina
+automáticamente tras un envío correcto o al cancelar el email.
 
-You can review and cancel scheduled emails in **Admin Panel → Scheduled emails**.
+## Solución de problemas
 
-## Timezone
+- **Los emails programados no se envían** → el cron / la cola de trabajos no está en ejecución.
+  Configúralo (ver Requisitos). Los pendientes se entregan en cuanto la cola pase su hora.
+- **Un email programado aparece como `failed`** → en *Emails programados*, la columna `error`
+  muestra el motivo (normalmente la configuración SMTP). Corrige el SMTP y reprográmalo.
+- **Falta un adjunto al enviar** → comprueba que existe `MyFiles/ScheduledMail/<id>/` y que los
+  archivos se copiaron. Solo se borran tras un envío correcto.
+- **SMTP** → el envío programado usa la **misma** configuración de email que el envío normal.
 
-The date/time you pick is interpreted in the **application/server timezone**
-(`FS_TIMEZONE`), which is what FacturaScripts uses internally (`Tools::dateTime()`).
-The 30-day window and the "must be in the future" check are validated server-side against
-the server clock. If your browser and server are in different timezones, the picker value
-is treated as server time — keep that in mind when scheduling close to "now".
+## Limitaciones
 
-## Attachments
+- Solo un plugin activo puede sobrescribir el controlador `SendMail` a la vez.
+- No hay reintento automático: un email fallido se marca `failed` y debe reprogramarse.
 
-Email attachments may be generated as temporary files that FacturaScripts prunes after a
-while. To make scheduling safe for up to 30 days, this plugin **copies** the document PDF
-and any uploaded files into `MyFiles/ScheduledMail/<id>/` when the email is scheduled. The
-folder is deleted automatically after a successful send or when the email is cancelled.
+## Desarrollo
 
-## How it works
+- `make upd` — arranca los contenedores Docker
+- `make lint` — comprueba el estilo de código
+- `make format` — corrige automáticamente el estilo
+- `make test` — ejecuta los tests unitarios
+- `make package VERSION=1` — genera el ZIP de distribución
 
-1. The plugin overrides the core `SendMail` controller (via the FacturaScripts Dinamic
-   class system — core files are **not** modified) and injects the date/time field into the
-   form through the core "include views" mechanism.
-2. When a valid future date/time is submitted, the email data is stored in a
-   `ScheduledMail` record, attachments are persisted, and a delayed event is registered with
-   `WorkQueue::sendFuture()`.
-3. The `SendScheduledMailWorker` worker picks up the event when the work queue runs at/after
-   the scheduled time, rebuilds the email with `NewMail` and sends it.
-4. On success the record is marked `sent`, attachments are removed and the document's
-   `femail` flag is set. On failure the record is marked `failed` and the error is stored
-   and logged.
+## Licencia
 
-## Troubleshooting
-
-- **Scheduled emails are never sent** → the work queue/cron is not running. Configure cron
-  (see Requirements). Pending emails are delivered as soon as the queue runs past their time.
-- **A scheduled email is marked `failed`** → open **Scheduled emails**, the `error` column
-  shows the reason (usually SMTP configuration). Fix the SMTP settings and reschedule.
-- **Attachment missing at send time** → check that `MyFiles/ScheduledMail/<id>/` exists and
-  the files were copied. Files are only deleted after a successful send.
-- **SMTP** → scheduled sending uses the **same** FacturaScripts email settings as normal
-  sending. If immediate sending works, scheduled sending uses the same configuration.
-
-## Limitations
-
-- Only one enabled plugin can override the `SendMail` controller at a time (FacturaScripts
-  loads a single Dinamic controller per name).
-- There is no automatic retry: a failed scheduled email is marked `failed` and must be
-  rescheduled manually.
-- A cleaner long-term solution would be a small upstream change so plugins can cancel the
-  send through a hook instead of overriding the controller (see `AGENTS.md`).
-
-## Manual test plan
-
-1. **No date** → behaves exactly like FacturaScripts today (immediate send, `femail` set).
-2. **+5 minutes** → not sent immediately; a `pending` row appears; after the work queue runs
-   past the time it becomes `sent` and the email is delivered.
-3. **Past date** → validation error, nothing scheduled.
-4. **More than 30 days ahead** → validation error (also blocked by the input `max`).
-5. **With attachment** → file copied to `MyFiles/ScheduledMail/<id>/`, still attached at
-   send time, deleted after success.
-6. **Cron not running** → email stays `pending` (documented behaviour).
-7. **SMTP failure** → record becomes `failed` and the error is stored/logged.
-8. **Related document** → marked as emailed only after a successful delivery.
-
-## Development
-
-- `make upd` — start the Docker dev environment
-- `make lint` — PHP CodeSniffer
-- `make format` — PHP CS Fixer
-- `make test` — PHPUnit
-- `make package VERSION=1` — build the distributable ZIP
-
-## License
-
-LGPL-3.0. See [LICENSE](LICENSE) for details.
+LGPL-3.0. Ver [LICENSE](LICENSE) para más detalles.

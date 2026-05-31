@@ -1,0 +1,80 @@
+{
+  "$schema": "./assets/blueprints/blueprint-schema.json",
+  "meta": {
+    "title": "ScheduledMail Playground Demo",
+    "author": "erseco",
+    "description": "Prueba ScheduledMail en FacturaScripts Playground con el plugin cargado desde este repositorio. Crea una factura, pulsa enviar email y elige una fecha futura para programar el envío. Demo login: admin/admin."
+  },
+  "debug": {
+    "enabled": true
+  },
+  "landingPage": "/ListScheduledMail",
+  "siteOptions": {
+    "title": "ScheduledMail Playground Demo",
+    "locale": "es_ES",
+    "timezone": "Europe/Madrid"
+  },
+  "login": {
+    "username": "admin",
+    "password": "admin"
+  },
+  "plugins": [
+    "https://github.com/erseco/facturascripts-plugin-ScheduledMail/archive/refs/heads/main.zip"
+  ],
+  "install": {
+    "codpais": "ESP",
+    "empresa": "Pepita Gómez - Autónoma",
+    "cifnif": "125478938W",
+    "tipoidfiscal": "NIF",
+    "regimeniva": "General",
+    "defaultplan": true
+  },
+  "seed": {
+    "customers": [
+      {
+        "nombre": "Cliente Demo",
+        "razonsocial": "Cliente Demo S.L.",
+        "cifnif": "B12345678",
+        "tipoidfiscal": "CIF",
+        "regimeniva": "General",
+        "email": "cliente@example.com",
+        "telefono1": "+34910000001",
+        "direccion": "Calle Demo 1",
+        "ciudad": "Madrid",
+        "provincia": "Madrid",
+        "codpais": "ESP",
+        "_unique": "cifnif"
+      },
+      {
+        "nombre": "Marketing Atlántico",
+        "razonsocial": "Marketing Atlántico S.L.",
+        "cifnif": "B38556677",
+        "tipoidfiscal": "CIF",
+        "regimeniva": "General",
+        "email": "facturacion@marketingatlantico.example",
+        "codpais": "ESP",
+        "_unique": "cifnif"
+      }
+    ],
+    "products": [
+      {
+        "referencia": "SERV-DEV",
+        "descripcion": "Desarrollo de software",
+        "precio": 75.00,
+        "_unique": "referencia"
+      },
+      {
+        "referencia": "SERV-CONSUL",
+        "descripcion": "Consultoría y formación",
+        "precio": 80.00,
+        "_unique": "referencia"
+      },
+      {
+        "referencia": "SERV-HOSTING",
+        "descripcion": "Hosting, dominios y SSL",
+        "precio": 9.99,
+        "_unique": "referencia"
+      }
+    ]
+  }
+}

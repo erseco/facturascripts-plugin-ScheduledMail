@@ -27,13 +27,15 @@
     </div>
 </div>
 <script>
-    (function () {
+    function scheduledMailInit() {
         const input = document.getElementById('email-scheduled-at');
         if (!input) {
             return;
         }
 
         const form = input.closest('form');
+        // The submit button is rendered after this include, so this code must
+        // run once the DOM is ready (see the readyState guard below).
         const button = form ? form.querySelector('button[type="submit"]') : null;
         const note = document.getElementById('scheduled-mail-active-note');
         if (!button) {
@@ -69,5 +71,11 @@
         input.addEventListener('input', updateButton);
         input.addEventListener('change', updateButton);
         updateButton();
-    })();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', scheduledMailInit);
+    } else {
+        scheduledMailInit();
+    }
 </script>
