@@ -20,6 +20,7 @@
 
 namespace FacturaScripts\Test\Plugins;
 
+use FacturaScripts\Plugins\ScheduledMail\Lib\ScheduleValidator;
 use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
 use PHPUnit\Framework\TestCase;
 
@@ -84,5 +85,31 @@ final class ScheduledMailTest extends TestCase
         $this->assertSame(ScheduledMail::STATUS_PENDING, $model->status);
         $this->assertFalse($model->reply_to);
         $this->assertNotEmpty($model->creation_date);
+    }
+
+    public function testTestRejectsMissingRecipient(): void
+    {
+        $model = new ScheduledMail();
+        $model->email_to = '   ';
+        $model->scheduled_at = date('Y-m-d H:i:s', time() + 3600);
+        $this->assertFalse($model->test());
+    }
+
+    public function testTestRejectsPastDateWhilePending(): void
+    {
+        $model = new ScheduledMail();
+        $model->status = ScheduledMail::STATUS_PENDING;
+        $model->email_to = 'someone@example.com';
+        $model->scheduled_at = date('Y-m-d H:i:s', time() - 3600);
+        $this->assertFalse($model->test());
+    }
+
+    public function testTestRejectsDateBeyondThirtyDaysWhilePending(): void
+    {
+        $model = new ScheduledMail();
+        $model->status = ScheduledMail::STATUS_PENDING;
+        $model->email_to = 'someone@example.com';
+        $model->scheduled_at = date('Y-m-d H:i:s', time() + ScheduleValidator::MAX_SCHEDULE_SECONDS + 3600);
+        $this->assertFalse($model->test());
     }
 }

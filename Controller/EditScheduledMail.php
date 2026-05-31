@@ -21,11 +21,21 @@
 namespace FacturaScripts\Plugins\ScheduledMail\Controller;
 
 use FacturaScripts\Core\Lib\ExtendedController\EditController;
+use FacturaScripts\Core\Tools;
+use FacturaScripts\Core\WorkQueue;
+use FacturaScripts\Plugins\ScheduledMail\Init;
+use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
 
 /**
- * Read-only detail view of a scheduled email. Reached by clicking a row in the
+ * Detail view of a scheduled email. Reached by clicking a row in the
  * ListScheduledMail page. Records are created from the SendMail form, so the
  * "new" button is disabled; the record can still be deleted to cancel it.
+ *
+ * A still-pending email can be rescheduled (date) or have its recipient
+ * corrected. Once it is sent/failed/cancelled the view stays read-only. The
+ * date is validated by the model (ScheduleValidator, via test()) and a fresh
+ * delayed work queue event is registered on save so delivery happens at the new
+ * time; superseded events become harmless no-ops thanks to the worker guards.
  *
  * @author Ernesto Serrano <info@ernesto.es>
  */
@@ -52,5 +62,81 @@ class EditScheduledMail extends EditController
 
         // Scheduled emails are created from the SendMail form, not here.
         $this->setSettings($this->getMainViewName(), 'btnNew', false);
+    }
+
+    /**
+     * Re-registers the delayed work queue event when a pending email's date
+     * changes, then delegates to the parent save flow.
+     *
+     * @return bool
+     */
+    protected function editAction()
+    {
+        // The persisted date before the form overwrites the model, used to
+        // detect an actual reschedule.
+        $previousScheduledAt = null;
+        $code = $this->request->input('code', '');
+        if ('' !== $code) {
+            $persisted = new ScheduledMail();
+            if ($persisted->loadFromCode($code) && $persisted->status === ScheduledMail::STATUS_PENDING) {
+                $previousScheduledAt = $persisted->scheduled_at;
+            }
+        }
+
+        if (false === parent::editAction()) {
+            return false;
+        }
+
+        $mail = $this->getModel();
+        if (
+            null !== $previousScheduledAt
+            && $mail->status === ScheduledMail::STATUS_PENDING
+            && $mail->scheduled_at !== $previousScheduledAt
+        ) {
+            $this->rescheduleWorkEvent($mail);
+        }
+
+        return true;
+    }
+
+    /**
+     * Registers a delayed work queue event for the email's current scheduled
+     * time so the worker delivers it at the new date.
+     *
+     * @param ScheduledMail $mail
+     */
+    protected function rescheduleWorkEvent(ScheduledMail $mail): void
+    {
+        $delay = strtotime($mail->scheduled_at) - time();
+        if ($delay < 0) {
+            $delay = 0;
+        }
+
+        if (false === WorkQueue::sendFuture($delay, Init::WORK_EVENT, (string)$mail->id, ['id' => $mail->id])) {
+            Tools::log()->error('scheduled-mail-no-worker');
+        }
+    }
+
+    /**
+     * Keeps the form read-only once the email is no longer pending.
+     *
+     * @param string $viewName
+     * @param mixed  $view
+     */
+    protected function loadData($viewName, $view)
+    {
+        parent::loadData($viewName, $view);
+
+        if (
+            $viewName !== $this->getMainViewName()
+            || $view->model->status === ScheduledMail::STATUS_PENDING
+        ) {
+            return;
+        }
+
+        $view->disableColumn('scheduled-at', false, 'true');
+        $view->disableColumn('email-to', false, 'true');
+        $this->setSettings($viewName, 'btnSave', false);
+        $this->setSettings($viewName, 'btnUndo', false);
     }
 }

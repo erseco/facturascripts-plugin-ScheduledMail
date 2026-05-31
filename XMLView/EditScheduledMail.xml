@@ -12,7 +12,7 @@
                 <widget type="text" fieldname="status" readonly="true"/>
             </column>
             <column name="scheduled-at" numcolumns="3" order="20">
-                <widget type="datetime" fieldname="scheduled_at" readonly="true"/>
+                <widget type="datetime" fieldname="scheduled_at" required="true"/>
             </column>
             <column name="sent-at" numcolumns="3" order="30">
                 <widget type="datetime" fieldname="sent_at" readonly="true"/>
@@ -29,7 +29,7 @@
                 <widget type="text" fieldname="email_from" readonly="true"/>
             </column>
             <column name="email-to" numcolumns="4" order="20">
-                <widget type="text" fieldname="email_to" readonly="true"/>
+                <widget type="text" fieldname="email_to" required="true"/>
             </column>
             <column name="email-cc" numcolumns="4" order="30">
                 <widget type="text" fieldname="email_cc" readonly="true"/>

@@ -23,6 +23,7 @@ namespace FacturaScripts\Plugins\ScheduledMail\Model;
 use FacturaScripts\Core\Model\Base\ModelClass;
 use FacturaScripts\Core\Model\Base\ModelTrait;
 use FacturaScripts\Core\Tools;
+use FacturaScripts\Plugins\ScheduledMail\Lib\ScheduleValidator;
 
 /**
  * A scheduled email waiting to be delivered by the work queue.
@@ -180,6 +181,18 @@ class ScheduledMail extends ModelClass
         if (empty($this->scheduled_at)) {
             Tools::log()->warning('scheduled-mail-no-date');
             return false;
+        }
+
+        // While the email is still pending (creation or a user reschedule), the
+        // date must stay within the allowed window. Saves performed by the
+        // worker carry a non-pending status (sent/failed) and are exempt, so
+        // delivering an email whose time has arrived is never blocked here.
+        if ($this->status === self::STATUS_PENDING) {
+            $result = ScheduleValidator::parse($this->scheduled_at, time());
+            if ($result['error'] !== ScheduleValidator::OK) {
+                Tools::log()->warning($result['error']);
+                return false;
+            }
         }
 
         $this->subject = Tools::noHtml($this->subject);
