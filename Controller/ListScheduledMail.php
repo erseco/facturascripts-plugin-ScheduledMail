@@ -26,7 +26,9 @@ use FacturaScripts\Core\Tools;
 use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
 
 /**
- * List and manage scheduled emails. Allows cancelling pending entries.
+ * Lists scheduled emails. Records are created from the SendMail form, so there
+ * is no "new" button: a pending email is cancelled by deleting it (the worker
+ * then skips the missing record and its files are removed).
  *
  * @author Ernesto Serrano <erseco@gmail.com>
  */
@@ -54,13 +56,15 @@ class ListScheduledMail extends ListController
         $this->addOrderBy($viewName, ['status'], 'status');
         $this->addSearchFields($viewName, ['email_to', 'subject', 'error']);
 
+        // Scheduled emails are created from the SendMail form, not here.
+        $this->setSettings($viewName, 'btnNew', false);
+
         // Status filter.
         $statusValues = [['label' => Tools::lang()->trans('all'), 'where' => []]];
         $statuses = [
             ScheduledMail::STATUS_PENDING => 'pending',
             ScheduledMail::STATUS_SENT => 'sent',
             ScheduledMail::STATUS_FAILED => 'failed',
-            ScheduledMail::STATUS_CANCELLED => 'cancelled',
         ];
         foreach ($statuses as $value => $label) {
             $statusValues[] = [
@@ -70,74 +74,5 @@ class ListScheduledMail extends ListController
         }
         $this->addFilterSelectWhere($viewName, 'status', $statusValues);
         $this->addFilterPeriod($viewName, 'scheduled', 'scheduled-at', 'scheduled_at', true);
-
-        // Cancel button (operates on the checked rows).
-        $this->addButton($viewName, [
-            'action' => 'cancel-scheduled',
-            'color' => 'warning',
-            'confirm' => 'true',
-            'icon' => 'fa-solid fa-ban',
-            'label' => 'cancel',
-            'type' => 'action',
-        ]);
-    }
-
-    /**
-     * @param string $action
-     *
-     * @return bool
-     */
-    protected function execPreviousAction($action)
-    {
-        if ($action === 'cancel-scheduled') {
-            $this->cancelScheduledAction();
-        }
-
-        return parent::execPreviousAction($action);
-    }
-
-    /**
-     * Cancels the checked pending scheduled emails and removes their files.
-     */
-    protected function cancelScheduledAction(): void
-    {
-        if (false === $this->permissions->allowUpdate) {
-            Tools::log()->warning('not-allowed-modify');
-            return;
-        }
-        if (false === $this->validateFormToken()) {
-            return;
-        }
-
-        $codes = $this->request->request->getArray('codes');
-        if (empty($codes)) {
-            return;
-        }
-
-        $cancelled = 0;
-        foreach ($codes as $code) {
-            $mail = new ScheduledMail();
-            if (false === $mail->load($code)) {
-                continue;
-            }
-
-            // Only pending emails can be cancelled.
-            if ($mail->status !== ScheduledMail::STATUS_PENDING) {
-                continue;
-            }
-
-            $mail->status = ScheduledMail::STATUS_CANCELLED;
-            if ($mail->save()) {
-                $folder = $mail->getFilesFolder();
-                if (is_dir($folder)) {
-                    Tools::folderDelete($folder);
-                }
-                $cancelled++;
-            }
-        }
-
-        if ($cancelled > 0) {
-            Tools::log()->notice('scheduled-mail-cancelled', ['%count%' => $cancelled]);
-        }
     }
 }

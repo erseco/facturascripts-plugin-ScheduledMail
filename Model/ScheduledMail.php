@@ -44,9 +44,6 @@ class ScheduledMail extends ModelClass
     /** Delivery failed (see the error column). */
     public const STATUS_FAILED = 'failed';
 
-    /** Cancelled by a user before delivery. */
-    public const STATUS_CANCELLED = 'cancelled';
-
     /** Folder, relative to FS_FOLDER, where scheduled attachments are stored. */
     public const FILES_PATH = 'MyFiles/ScheduledMail';
 
@@ -113,6 +110,27 @@ class ScheduledMail extends ModelClass
         $this->status = self::STATUS_PENDING;
         $this->creation_date = Tools::dateTime();
         $this->reply_to = false;
+    }
+
+    /**
+     * Deleting a scheduled email also removes its stored attachment files.
+     * This is how a pending email is cancelled: once the record is gone, the
+     * worker simply skips the (now missing) record when the event fires.
+     *
+     * @return bool
+     */
+    public function delete(): bool
+    {
+        $folder = $this->getFilesFolder();
+        if (false === parent::delete()) {
+            return false;
+        }
+
+        if (is_dir($folder)) {
+            Tools::folderDelete($folder);
+        }
+
+        return true;
     }
 
     /**
