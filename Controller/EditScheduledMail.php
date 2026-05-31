@@ -62,6 +62,13 @@ class EditScheduledMail extends EditController
 
         // Scheduled emails are created from the SendMail form, not here.
         $this->setSettings($this->getMainViewName(), 'btnNew', false);
+
+        // A scheduled email is an internal queue record, not a printable
+        // document. Hide the print/email dropdown: its "Email" option would
+        // reopen SendMail with modelClassName=ScheduledMail and crash, because
+        // the core controller calls $model->load() which this model does not
+        // implement.
+        $this->setSettings($this->getMainViewName(), 'btnPrint', false);
     }
 
     /**
@@ -134,8 +141,9 @@ class EditScheduledMail extends EditController
             return;
         }
 
-        $view->disableColumn('scheduled-at', false, 'true');
-        $view->disableColumn('email-to', false, 'true');
+        foreach (['scheduled-at', 'email-to', 'email-cc', 'email-bcc', 'subject', 'body'] as $column) {
+            $view->disableColumn($column, false, 'true');
+        }
         $this->setSettings($viewName, 'btnSave', false);
         $this->setSettings($viewName, 'btnUndo', false);
     }

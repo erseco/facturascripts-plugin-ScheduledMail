@@ -32,16 +32,16 @@
                 <widget type="text" fieldname="email_to" required="true"/>
             </column>
             <column name="email-cc" numcolumns="4" order="30">
-                <widget type="text" fieldname="email_cc" readonly="true"/>
+                <widget type="text" fieldname="email_cc"/>
             </column>
             <column name="email-bcc" numcolumns="4" order="40">
-                <widget type="text" fieldname="email_bcc" readonly="true"/>
+                <widget type="text" fieldname="email_bcc"/>
             </column>
             <column name="subject" numcolumns="8" order="50">
-                <widget type="text" fieldname="subject" readonly="true"/>
+                <widget type="text" fieldname="subject"/>
             </column>
             <column name="body" numcolumns="12" order="60">
-                <widget type="textarea" fieldname="body" readonly="true"/>
+                <widget type="textarea" fieldname="body"/>
             </column>
         </group>
         <group name="details" title="details" numcolumns="12">
