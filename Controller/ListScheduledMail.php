@@ -63,6 +63,11 @@ class ListScheduledMail extends ListController
         // Scheduled emails are created from the SendMail form, not here.
         $this->setSettings($viewName, 'btnNew', false);
 
+        // These are internal queue records, not printable documents; hide the
+        // print/email dropdown (its "Email" option would reopen SendMail with
+        // modelClassName=ScheduledMail and crash on $model->load()).
+        $this->setSettings($viewName, 'btnPrint', false);
+
         // Status filter.
         $statusValues = [['label' => Tools::lang()->trans('all'), 'where' => []]];
         $statuses = [
