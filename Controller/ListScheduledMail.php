@@ -51,7 +51,11 @@ class ListScheduledMail extends ListController
     protected function createViewScheduledMail(string $viewName = 'ListScheduledMail'): void
     {
         $this->addView($viewName, 'ScheduledMail', 'scheduled-mails', 'fa-regular fa-clock');
-        $this->addOrderBy($viewName, ['scheduled_at'], 'scheduled-at', 2);
+        // Default order by id (most recent first): every pending email tends to
+        // share the same scheduled_at, so ordering by date looked like it was
+        // grouping by status instead.
+        $this->addOrderBy($viewName, ['id'], 'id', 2);
+        $this->addOrderBy($viewName, ['scheduled_at'], 'scheduled-at');
         $this->addOrderBy($viewName, ['creation_date'], 'creation-date');
         $this->addOrderBy($viewName, ['status'], 'status');
         $this->addSearchFields($viewName, ['email_to', 'subject', 'error']);

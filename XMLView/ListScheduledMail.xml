@@ -6,7 +6,7 @@
 <view>
     <columns>
         <column name="id" order="100">
-            <widget type="number" fieldname="id" readonly="true"/>
+            <widget type="number" fieldname="id" decimal="0" readonly="true"/>
         </column>
         <column name="status" order="110" display="center">
             <widget type="text" fieldname="status">
