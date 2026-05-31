@@ -35,12 +35,12 @@ jobs:
           git config user.email "actions@github.com"
           git add facturascripts.ini
           git commit -m "Update version to ${{ steps.version.outputs.VERSION }}" || true
-          git archive --format=zip --prefix=PluginTemplate/ HEAD -o PluginTemplate-${{ steps.version.outputs.VERSION }}.zip
+          git archive --format=zip --prefix=ScheduledMail/ HEAD -o ScheduledMail-${{ steps.version.outputs.VERSION }}.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: PluginTemplate-${{ steps.version.outputs.VERSION }}.zip
+          files: ScheduledMail-${{ steps.version.outputs.VERSION }}.zip
           generate_release_notes: true
 
       # When forking this template, update plugin-slug to the slug your
@@ -48,8 +48,8 @@ jobs:
       - name: Publish to FacturaScripts forja
         uses: erseco/action-facturascripts-publicar-forja@v1
         with:
-          plugin-slug: plugintemplate
-          zip-path: PluginTemplate-${{ steps.version.outputs.VERSION }}.zip
+          plugin-slug: scheduledmail
+          zip-path: ScheduledMail-${{ steps.version.outputs.VERSION }}.zip
           version: ${{ steps.version.outputs.VERSION }}
           status: stable
           forja-user: ${{ secrets.FS_FORJA_USER }}

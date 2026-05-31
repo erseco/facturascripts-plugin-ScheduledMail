@@ -3,6 +3,10 @@
 Thumbs.db
 desktop.ini
 
+# Agent tooling state
+.omc/
+.claude/
+
 # IDE and Editor Files
 .vscode/
 .idea/

@@ -1,0 +1,73 @@
+{#
+    This file is part of ScheduledMail plugin for FacturaScripts.
+    Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+
+    Injected into the core SendMail form (position "beforeEnd", right before the
+    send button) through the FacturaScripts include-views mechanism. Adds the
+    optional "Schedule send" datetime field and the script that turns the send
+    button into a scheduled-send button when a valid future date is selected.
+
+    The min/max attributes are rendered in the application timezone; the server
+    re-validates the 30-day window, so this is only a convenience.
+#}
+<div class="mb-3">
+    <div class="input-group">
+        <span class="input-group-text">
+            <i class="fa-regular fa-clock fa-fw" aria-hidden="true"></i>
+        </span>
+        <input type="datetime-local" id="email-scheduled-at" name="email-scheduled-at"
+               class="form-control"
+               min="{{ "now"|date("Y-m-d\\TH:i") }}"
+               max="{{ "+30 days"|date("Y-m-d\\TH:i") }}"
+               placeholder="{{ trans('schedule-send') }}"/>
+    </div>
+    <small class="form-text text-muted">{{ trans('scheduled-mail-hint') }}</small>
+    <div id="scheduled-mail-active-note" class="form-text text-warning d-none">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i> {{ trans('scheduled-mail-active-note') }}
+    </div>
+</div>
+<script>
+    (function () {
+        const input = document.getElementById('email-scheduled-at');
+        if (!input) {
+            return;
+        }
+
+        const form = input.closest('form');
+        const button = form ? form.querySelector('button[type="submit"]') : null;
+        const note = document.getElementById('scheduled-mail-active-note');
+        if (!button) {
+            return;
+        }
+
+        const labels = {
+            send: '{{ trans('send')|e('js') }}',
+            schedule: '{{ trans('schedule-send')|e('js') }}'
+        };
+
+        function updateButton() {
+            const value = input.value;
+            const scheduled = value !== '' && new Date(value).getTime() > Date.now();
+
+            if (scheduled) {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-warning');
+                button.innerHTML = '<i class="fa-regular fa-clock me-1" aria-hidden="true"></i> ' + labels.schedule;
+                if (note) {
+                    note.classList.remove('d-none');
+                }
+            } else {
+                button.classList.remove('btn-warning');
+                button.classList.add('btn-primary');
+                button.innerHTML = '<i class="fa-solid fa-envelope me-1" aria-hidden="true"></i> ' + labels.send;
+                if (note) {
+                    note.classList.add('d-none');
+                }
+            }
+        }
+
+        input.addEventListener('input', updateButton);
+        input.addEventListener('change', updateButton);
+        updateButton();
+    })();
+</script>

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of PluginTemplate plugin for FacturaScripts.
- * Copyright (C) 2025 Your Name <your@email.com>
+ * This file is part of ScheduledMail plugin for FacturaScripts.
+ * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,52 +18,63 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace FacturaScripts\Plugins\PluginTemplate;
+namespace FacturaScripts\Plugins\ScheduledMail;
 
 use FacturaScripts\Core\Template\InitClass;
+use FacturaScripts\Core\WorkQueue;
 
 /**
- * Plugin initialization class
+ * Plugin initialization class.
  *
- * This class is called when the plugin is loaded.
- * It can be used to load extensions, modify core behavior, etc.
+ * Registers the worker that delivers scheduled emails. The SendMail form is
+ * extended in two ways that do NOT require registration here:
+ *  - The datetime field and button JavaScript are injected through the core
+ *    "include views" mechanism (Extension/View/SendMail_beforeEnd_100.html.twig).
+ *  - The send flow is intercepted by overriding the core controller with a
+ *    same-named class (Controller/SendMail.php), which FacturaScripts loads
+ *    instead of the core one via the Dinamic class system.
  *
- * @author Your Name <your@email.com>
+ * @author Ernesto Serrano <erseco@gmail.com>
  */
 class Init extends InitClass
 {
     /**
-     * Called when the plugin is loaded
+     * Event name used for the delayed work queue events.
+     */
+    public const WORK_EVENT = 'ScheduledMail.Send';
+
+    /**
+     * Called on every request while the plugin is enabled.
      *
      * @return void
      */
     public function init(): void
     {
-        // Load your extensions here
-        // Example:
-        // $this->loadExtension(new Extension\Controller\EditCliente());
-        // $this->loadExtension(new Extension\Model\Cliente());
+        // Register the worker that picks up the delayed work queue events and
+        // sends the scheduled emails. WorkQueue::sendFuture() only stores an
+        // event when a worker matches the event name, so this is required.
+        WorkQueue::addWorker('SendScheduledMailWorker', self::WORK_EVENT);
     }
 
     /**
-     * Called when the plugin is updated
+     * Called when the plugin version changes.
      *
      * @return void
      */
     public function update(): void
     {
-        // Add update logic here if needed
-        // This is called when the plugin version changes
+        // No data migrations needed; the scheduled_mails table is created
+        // automatically from Table/scheduled_mails.xml.
     }
 
     /**
-     * Called when the plugin is uninstalled
+     * Called when the plugin is uninstalled.
      *
      * @return void
      */
     public function uninstall(): void
     {
-        // Add cleanup logic here if needed
-        // This is called when the plugin is uninstalled
+        // Nothing to clean up here. Pending scheduled emails and their stored
+        // attachments remain in MyFiles/ScheduledMail/ for manual review.
     }
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of ScheduledMail plugin for FacturaScripts.
+    Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+-->
+<view>
+    <columns>
+        <column name="id" order="100">
+            <widget type="number" fieldname="id" readonly="true"/>
+        </column>
+        <column name="status" order="110" display="center">
+            <widget type="text" fieldname="status">
+                <values>
+                    <value title="pending" color="info">pending</value>
+                    <value title="sent" color="success">sent</value>
+                    <value title="failed" color="danger">failed</value>
+                    <value title="cancelled" color="secondary">cancelled</value>
+                </values>
+            </widget>
+        </column>
+        <column name="scheduled-at" order="120">
+            <widget type="datetime" fieldname="scheduled_at" readonly="true"/>
+        </column>
+        <column name="email-to" order="130">
+            <widget type="text" fieldname="email_to" readonly="true"/>
+        </column>
+        <column name="subject" order="140">
+            <widget type="text" fieldname="subject" readonly="true"/>
+        </column>
+        <column name="sent-at" order="150" display="right">
+            <widget type="datetime" fieldname="sent_at" readonly="true"/>
+        </column>
+        <column name="creation-date" order="160" display="none">
+            <widget type="datetime" fieldname="creation_date" readonly="true"/>
+        </column>
+        <column name="error" order="170" display="none">
+            <widget type="textarea" fieldname="error" readonly="true"/>
+        </column>
+    </columns>
+</view>

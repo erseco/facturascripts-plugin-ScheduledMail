@@ -21,7 +21,7 @@ Login with:
 
 ## 3. Enable the Plugin
 
-Go to **Admin Panel → Plugins** and enable **PluginTemplate**.
+Go to **Admin Panel → Plugins** and enable **ScheduledMail**.
 
 Or run:
 ```bash

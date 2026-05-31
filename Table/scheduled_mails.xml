@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of ScheduledMail plugin for FacturaScripts.
+    Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
+
+    Table that stores scheduled (pending) emails until the work queue delivers
+    them. It is NOT a sent-history table (that is the core emails_sent table).
+-->
+<table>
+    <column>
+        <name>id</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>creation_date</name>
+        <type>timestamp</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>scheduled_at</name>
+        <type>timestamp</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>sent_at</name>
+        <type>timestamp</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>status</name>
+        <type>character varying(20)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>email_from</name>
+        <type>character varying(255)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>email_to</name>
+        <type>text</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>email_cc</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>email_bcc</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>subject</name>
+        <type>character varying(255)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>body</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>reply_to</name>
+        <type>boolean</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>attachments_json</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>model_class_name</name>
+        <type>character varying(100)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>model_code</name>
+        <type>character varying(50)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>model_codes</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>nick</name>
+        <type>character varying(50)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>idworkevent</name>
+        <type>integer</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>error</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <constraint>
+        <name>scheduled_mails_pkey</name>
+        <type>PRIMARY KEY (id)</type>
+    </constraint>
+</table>

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of PluginTemplate plugin for FacturaScripts.
- * Copyright (C) 2025 Your Name <your@email.com>
+ * This file is part of ScheduledMail plugin for FacturaScripts.
+ * Copyright (C) 2025 Ernesto Serrano <erseco@gmail.com>
  *
  * Script to install plugins for testing
  */
