@@ -28,12 +28,23 @@ Or run:
 make enable-plugin
 ```
 
-## 4. Access the Example Pages
+## 4. Configure email (Mailpit)
 
-After enabling the plugin, you'll see new menu items:
+The dev environment includes **Mailpit**, a local SMTP server that catches every
+email FacturaScripts sends.
 
-- **Example Controller** - A basic controller example
-- **Example Models** - A list view with CRUD operations
+- Mailpit web UI: <http://localhost:8025>
+- In FacturaScripts go to **Admin Panel → Email** (`/ConfigEmail`) and set:
+  - **From / email:** `demo@example.com` (any address)
+  - **Host:** `mailpit`
+  - **Port:** `1025`
+  - **User / Password:** leave empty (Mailpit accepts anything)
+  - **Encryption:** none
+
+Now open any invoice → **Send email**, pick a future date in **Schedule send**, and
+submit. Cron is enabled (`RUN_CRON_TASKS: "true"`), so when the time arrives the work
+queue delivers the email and it appears in Mailpit. Review scheduled emails in
+**Admin Panel → Scheduled emails**.
 
 ## 5. Make Changes
 

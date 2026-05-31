@@ -1,6 +1,8 @@
 # Export ignore - these files will not be included in git archive or releases
 # Development and testing files
 /.aider*                export-ignore
+/.claude/               export-ignore
+/.omc/                  export-ignore
 /.DS_Store              export-ignore
 /.editorconfig          export-ignore
 /.env                   export-ignore
@@ -15,6 +17,14 @@
 /examples/              export-ignore
 /QUICKSTART.md          export-ignore
 /README.md              export-ignore
+
+# Agent / AI instruction files
+/AGENTS.md              export-ignore
+/CLAUDE.md              export-ignore
+/GEMINI.md              export-ignore
+
+# Playground demo (not needed at runtime)
+/blueprint.json         export-ignore
 
 # Build and dependencies
 /vendor/                export-ignore

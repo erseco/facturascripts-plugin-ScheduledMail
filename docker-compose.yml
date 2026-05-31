@@ -34,8 +34,8 @@ services:
       FS_TIMEZONE: Europe/Madrid
       # Debug mode (set to false in production)
       FS_DEBUG: "true"
-      # Disable cron tasks in development
-      RUN_CRON_TASKS: "false"
+      # Enable cron so the work queue runs and scheduled emails are delivered.
+      RUN_CRON_TASKS: "true"
     volumes:
       - facturascripts_data:/var/www/html/volume
       # Mount the plugin directory
@@ -43,6 +43,20 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  # Local SMTP server to catch sent (and scheduled) emails.
+  # Web UI: http://localhost:8025 — SMTP host "mailpit", port 1025 (no auth/encryption).
+  # Configure it once in FacturaScripts at Admin > Email (/ConfigEmail).
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
 
 volumes:
   mariadb_data:

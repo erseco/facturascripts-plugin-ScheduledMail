@@ -76,5 +76,17 @@
         "_unique": "referencia"
       }
     ]
+  },
+  "settings": {
+    "email": {
+      "email": "demo@ethereal.email",
+      "host": "smtp.ethereal.email",
+      "port": "587",
+      "user": "demo@ethereal.email",
+      "password": "ethereal-demo",
+      "mailer": "smtp",
+      "enc": "tls",
+      "lowsecure": "1"
+    }
   }
 }
