@@ -27,6 +27,10 @@
     </div>
 </div>
 <script>
+    // Maximum scheduling window in milliseconds (30 days), mirroring the
+    // server-side ScheduleValidator::MAX_SCHEDULE_SECONDS constant.
+    const SCHEDULED_MAIL_MAX_MS = 30 * 24 * 60 * 60 * 1000;
+
     function scheduledMailInit() {
         const input = document.getElementById('email-scheduled-at');
         if (!input) {
@@ -47,9 +51,50 @@
             schedule: '{{ trans('schedule-send')|e('js') }}'
         };
 
+        // Localized constraint messages, kept in sync with the server validator
+        // error keys (ScheduleValidator::ERR_PAST / ERR_TOO_FAR).
+        const messages = {
+            past: '{{ trans('scheduled-date-in-past')|e('js') }}',
+            tooFar: '{{ trans('scheduled-date-too-far')|e('js') }}'
+        };
+
+        // Formats a Date as a local "Y-m-d\TH:i" string for datetime-local
+        // min/max attributes (the picker interprets them in local time).
+        function toLocalInput(date) {
+            const pad = (n) => String(n).padStart(2, '0');
+            return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
+                'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+        }
+
+        // Refreshes the min/max bounds against the client clock so they never go
+        // stale while the form stays open.
+        function refreshBounds(now) {
+            input.min = toLocalInput(new Date(now));
+            input.max = toLocalInput(new Date(now + SCHEDULED_MAIL_MAX_MS));
+        }
+
         function updateButton() {
+            const now = Date.now();
+            refreshBounds(now);
+
             const value = input.value;
-            const scheduled = value !== '' && new Date(value).getTime() > Date.now();
+            const timestamp = value === '' ? NaN : new Date(value).getTime();
+
+            // Validate manual input too: block submission with a clear, localized
+            // message when the date falls outside the allowed window. The server
+            // remains the source of truth; this is a convenience guard.
+            let validity = '';
+            if (!Number.isNaN(timestamp)) {
+                if (timestamp <= now) {
+                    validity = messages.past;
+                } else if (timestamp - now > SCHEDULED_MAIL_MAX_MS) {
+                    validity = messages.tooFar;
+                }
+            }
+            input.setCustomValidity(validity);
+            input.classList.toggle('is-invalid', validity !== '');
+
+            const scheduled = !Number.isNaN(timestamp) && timestamp > now && validity === '';
 
             if (scheduled) {
                 button.classList.remove('btn-primary');
