@@ -55,13 +55,20 @@ class ListScheduledMail extends ListController
         $this->addSearchFields($viewName, ['email_to', 'subject', 'error']);
 
         // Status filter.
-        $this->addFilterSelectWhere($viewName, 'status', [
-            ['label' => Tools::lang()->trans('all'), 'where' => []],
-            ['label' => Tools::lang()->trans('pending'), 'where' => [new DataBaseWhere('status', ScheduledMail::STATUS_PENDING)]],
-            ['label' => Tools::lang()->trans('sent'), 'where' => [new DataBaseWhere('status', ScheduledMail::STATUS_SENT)]],
-            ['label' => Tools::lang()->trans('failed'), 'where' => [new DataBaseWhere('status', ScheduledMail::STATUS_FAILED)]],
-            ['label' => Tools::lang()->trans('cancelled'), 'where' => [new DataBaseWhere('status', ScheduledMail::STATUS_CANCELLED)]],
-        ]);
+        $statusValues = [['label' => Tools::lang()->trans('all'), 'where' => []]];
+        $statuses = [
+            ScheduledMail::STATUS_PENDING => 'pending',
+            ScheduledMail::STATUS_SENT => 'sent',
+            ScheduledMail::STATUS_FAILED => 'failed',
+            ScheduledMail::STATUS_CANCELLED => 'cancelled',
+        ];
+        foreach ($statuses as $value => $label) {
+            $statusValues[] = [
+                'label' => Tools::lang()->trans($label),
+                'where' => [new DataBaseWhere('status', $value)],
+            ];
+        }
+        $this->addFilterSelectWhere($viewName, 'status', $statusValues);
         $this->addFilterPeriod($viewName, 'scheduled', 'scheduled-at', 'scheduled_at', true);
 
         // Cancel button (operates on the checked rows).
