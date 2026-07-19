@@ -54,12 +54,14 @@ class SendMail
                 return;
             }
 
-            if (ScheduledMailScheduler::schedule(
-                $this->newMail,
-                $this->request,
-                $this->user,
-                $result['timestamp']
-            )) {
+            if (
+                ScheduledMailScheduler::schedule(
+                    $this->newMail,
+                    $this->request,
+                    $this->user,
+                    $result['timestamp']
+                )
+            ) {
                 Tools::log()->notice('scheduled-mail-ok');
                 $this->redirectAfter();
                 return;
