@@ -3,7 +3,6 @@
     <description>Coding standard for FacturaScripts plugins based on PSR-12</description>
 
     <!-- Files to check -->
-    <file>Controller</file>
     <file>Model</file>
     <file>Extension</file>
     <file>Test</file>

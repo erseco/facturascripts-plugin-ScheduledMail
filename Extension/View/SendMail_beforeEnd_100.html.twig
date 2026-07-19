@@ -27,8 +27,6 @@
     </div>
 </div>
 <script>
-    // Maximum scheduling window in milliseconds (30 days), mirroring the
-    // server-side ScheduleValidator::MAX_SCHEDULE_SECONDS constant.
     const SCHEDULED_MAIL_MAX_MS = 30 * 24 * 60 * 60 * 1000;
 
     function scheduledMailInit() {
@@ -38,11 +36,10 @@
         }
 
         const form = input.closest('form');
-        // The submit button is rendered after this include, so this code must
-        // run once the DOM is ready (see the readyState guard below).
         const button = form ? form.querySelector('button[type="submit"]') : null;
+        const actionInput = form ? form.querySelector('input[name="action"]') : null;
         const note = document.getElementById('scheduled-mail-active-note');
-        if (!button) {
+        if (!button || !actionInput) {
             return;
         }
 
@@ -50,24 +47,17 @@
             send: '{{ trans('send')|e('js') }}',
             schedule: '{{ trans('schedule-send')|e('js') }}'
         };
-
-        // Localized constraint messages, kept in sync with the server validator
-        // error keys (ScheduleValidator::ERR_PAST / ERR_TOO_FAR).
         const messages = {
             past: '{{ trans('scheduled-date-in-past')|e('js') }}',
             tooFar: '{{ trans('scheduled-date-too-far')|e('js') }}'
         };
 
-        // Formats a Date as a local "Y-m-d\TH:i" string for datetime-local
-        // min/max attributes (the picker interprets them in local time).
         function toLocalInput(date) {
-            const pad = (n) => String(n).padStart(2, '0');
+            const pad = (number) => String(number).padStart(2, '0');
             return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
                 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
         }
 
-        // Refreshes the min/max bounds against the client clock so they never go
-        // stale while the form stays open.
         function refreshBounds(now) {
             input.min = toLocalInput(new Date(now));
             input.max = toLocalInput(new Date(now + SCHEDULED_MAIL_MAX_MS));
@@ -79,10 +69,6 @@
 
             const value = input.value;
             const timestamp = value === '' ? NaN : new Date(value).getTime();
-
-            // Validate manual input too: block submission with a clear, localized
-            // message when the date falls outside the allowed window. The server
-            // remains the source of truth; this is a convenience guard.
             let validity = '';
             if (!Number.isNaN(timestamp)) {
                 if (timestamp <= now) {
@@ -95,6 +81,7 @@
             input.classList.toggle('is-invalid', validity !== '');
 
             const scheduled = !Number.isNaN(timestamp) && timestamp > now && validity === '';
+            actionInput.value = scheduled ? 'schedule' : 'send';
 
             if (scheduled) {
                 button.classList.remove('btn-primary');

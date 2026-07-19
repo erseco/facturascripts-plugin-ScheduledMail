@@ -22,17 +22,14 @@ namespace FacturaScripts\Plugins\ScheduledMail;
 
 use FacturaScripts\Core\Template\InitClass;
 use FacturaScripts\Core\WorkQueue;
+use FacturaScripts\Plugins\ScheduledMail\Extension\Controller\SendMail;
 
 /**
  * Plugin initialization class.
  *
- * Registers the worker that delivers scheduled emails. The SendMail form is
- * extended in two ways that do NOT require registration here:
- *  - The datetime field and button JavaScript are injected through the core
- *    "include views" mechanism (Extension/View/SendMail_beforeEnd_100.html.twig).
- *  - The send flow is intercepted by overriding the core controller with a
- *    same-named class (Controller/SendMail.php), which FacturaScripts loads
- *    instead of the core one via the Dinamic class system.
+ * Registers the SendMail controller extension and the worker that delivers
+ * scheduled emails. The datetime field and button JavaScript are injected
+ * through the core include views mechanism.
  *
  * @author Ernesto Serrano <info@ernesto.es>
  */
@@ -45,21 +42,15 @@ class Init extends InitClass
 
     /**
      * Called on every request while the plugin is enabled.
-     *
-     * @return void
      */
     public function init(): void
     {
-        // Register the worker that picks up the delayed work queue events and
-        // sends the scheduled emails. WorkQueue::sendFuture() only stores an
-        // event when a worker matches the event name, so this is required.
+        $this->loadExtension(new SendMail());
         WorkQueue::addWorker('SendScheduledMailWorker', self::WORK_EVENT);
     }
 
     /**
      * Called when the plugin version changes.
-     *
-     * @return void
      */
     public function update(): void
     {
@@ -69,8 +60,6 @@ class Init extends InitClass
 
     /**
      * Called when the plugin is uninstalled.
-     *
-     * @return void
      */
     public function uninstall(): void
     {
