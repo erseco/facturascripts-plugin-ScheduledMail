@@ -20,9 +20,9 @@
 
 namespace FacturaScripts\Plugins\ScheduledMail\Controller;
 
-use FacturaScripts\Core\Where;
 use FacturaScripts\Core\Lib\ExtendedController\ListController;
 use FacturaScripts\Core\Tools;
+use FacturaScripts\Core\Where;
 use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
 
 /**

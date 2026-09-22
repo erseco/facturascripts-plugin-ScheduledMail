@@ -76,9 +76,9 @@ final class ScheduledMailScheduler
         $mail->body = $newMail->text;
         $mail->reply_to = (bool) $request->input('replyto', '0');
         $mail->nick = $user->nick;
-        $mail->model_class_name = $request->queryOrInput('modelClassName', '') ?: null;
-        $mail->model_code = $request->queryOrInput('modelCode', '') ?: null;
-        $mail->model_codes = $request->queryOrInput('modelCodes', '') ?: null;
+        $mail->model_class_name = $request->query('modelClassName', $request->input('modelClassName', '')) ?: null;
+        $mail->model_code = $request->query('modelCode', $request->input('modelCode', '')) ?: null;
+        $mail->model_codes = $request->query('modelCodes', $request->input('modelCodes', '')) ?: null;
 
         if (false === $mail->save()) {
             return false;
