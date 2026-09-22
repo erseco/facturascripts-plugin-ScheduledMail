@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="Test/bootstrap.php" colors="true" failOnWarning="true">
+    <testsuites>
+        <testsuite name="ScheduledMail"><directory>Test/Plugins</directory></testsuite>
+    </testsuites>
+    <coverage includeUncoveredFiles="true" processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">Plugins/ScheduledMail/Controller</directory>
+            <directory suffix=".php">Plugins/ScheduledMail/Extension</directory>
+            <directory suffix=".php">Plugins/ScheduledMail/Lib</directory>
+            <directory suffix=".php">Plugins/ScheduledMail/Model</directory>
+            <directory suffix=".php">Plugins/ScheduledMail/Worker</directory>
+            <file>Plugins/ScheduledMail/Init.php</file>
+        </include>
+    </coverage>
+</phpunit>

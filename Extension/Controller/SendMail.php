@@ -22,8 +22,8 @@ namespace FacturaScripts\Plugins\ScheduledMail\Extension\Controller;
 
 use Closure;
 use FacturaScripts\Core\Tools;
-use FacturaScripts\Plugins\ScheduledMail\Lib\ScheduleValidator;
 use FacturaScripts\Plugins\ScheduledMail\Lib\ScheduledMailScheduler;
+use FacturaScripts\Plugins\ScheduledMail\Lib\ScheduleValidator;
 
 /**
  * Handles the custom schedule action after the core SendMail controller has

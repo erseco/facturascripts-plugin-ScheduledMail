@@ -85,7 +85,7 @@ class EditScheduledMail extends EditController
         $code = $this->request->input('code', '');
         if ('' !== $code) {
             $persisted = new ScheduledMail();
-            if ($persisted->loadFromCode($code) && $persisted->status === ScheduledMail::STATUS_PENDING) {
+            if ($persisted->load($code) && $persisted->status === ScheduledMail::STATUS_PENDING) {
                 $previousScheduledAt = $persisted->scheduled_at;
             }
         }

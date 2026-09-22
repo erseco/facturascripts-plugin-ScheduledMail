@@ -1,5 +1,7 @@
 # ScheduledMail para FacturaScripts
 
+[![codecov](https://codecov.io/gh/erseco/facturascripts-plugin-ScheduledMail/branch/main/graph/badge.svg)](https://codecov.io/gh/erseco/facturascripts-plugin-ScheduledMail)
+
 <a href="https://erseco.github.io/facturascripts-playground/?blueprint=https%3A%2F%2Fraw.githubusercontent.com%2Ferseco%2Ffacturascripts-plugin-ScheduledMail%2Frefs%2Fheads%2Fmain%2Fblueprint.json">
   <img src="https://raw.githubusercontent.com/erseco/facturascripts-playground/main/ogimage.png" alt="Prueba ScheduledMail en tu navegador" width="220">
 </a><br>

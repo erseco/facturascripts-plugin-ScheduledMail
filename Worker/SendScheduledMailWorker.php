@@ -44,7 +44,7 @@ class SendScheduledMailWorker extends WorkerClass
         $id = $event->param('id') ?? $event->value;
 
         $mail = new ScheduledMail();
-        if (empty($id) || false === $mail->loadFromCode($id)) {
+        if (empty($id) || false === $mail->load($id)) {
             // Nothing to do; the record was deleted (this is how a user cancels).
             return $this->done();
         }
@@ -94,7 +94,7 @@ class SendScheduledMailWorker extends WorkerClass
         $user = null;
         if (!empty($mail->nick)) {
             $candidate = new User();
-            if ($candidate->loadFromCode($mail->nick)) {
+            if ($candidate->load($mail->nick)) {
                 $user = $candidate;
                 $newMail->setUser($user);
             }
@@ -159,7 +159,7 @@ class SendScheduledMailWorker extends WorkerClass
 
         foreach (array_unique($codes) as $code) {
             $model = new $className();
-            if ($model->loadFromCode($code) && $model->hasColumn('femail')) {
+            if ($model->load($code) && $model->hasColumn('femail')) {
                 $model->femail = Tools::date();
                 $model->save();
             }
