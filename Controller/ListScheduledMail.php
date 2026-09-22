@@ -20,7 +20,7 @@
 
 namespace FacturaScripts\Plugins\ScheduledMail\Controller;
 
-use FacturaScripts\Core\Base\DataBase\DataBaseWhere;
+use FacturaScripts\Core\Where;
 use FacturaScripts\Core\Lib\ExtendedController\ListController;
 use FacturaScripts\Core\Tools;
 use FacturaScripts\Plugins\ScheduledMail\Model\ScheduledMail;
@@ -78,7 +78,7 @@ class ListScheduledMail extends ListController
         foreach ($statuses as $value => $label) {
             $statusValues[] = [
                 'label' => Tools::lang()->trans($label),
-                'where' => [new DataBaseWhere('status', $value)],
+                'where' => [new Where('status', $value)],
             ];
         }
         $this->addFilterSelectWhere($viewName, 'status', $statusValues);
