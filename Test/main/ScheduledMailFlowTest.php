@@ -230,6 +230,13 @@ final class ScheduledMailFlowTest extends TestCase
     public function testEditingPendingDateRegistersNewEvent(): void
     {
         $mail = $this->makeStored();
+        // Scheduling and editing happen in separate HTTP requests. Reset the
+        // core's per-request event deduplication before simulating the edit.
+        $workers = WorkQueue::getWorkersList();
+        WorkQueue::clear();
+        foreach ($workers as $worker) {
+            WorkQueue::addWorker($worker['name'], $worker['event'], $worker['position']);
+        }
         $page = new class ('EditScheduledMail') extends EditScheduledMail {
             protected function validateFormToken(): bool
             {
