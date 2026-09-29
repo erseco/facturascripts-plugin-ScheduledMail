@@ -11,7 +11,7 @@ the standard `SendMail` form. An empty schedule field keeps the current immediat
 behaviour; a future date/time persists the email and delivers it later through the native
 FacturaScripts work queue (cron).
 
-Compatibility: **FacturaScripts 2025+**, **PHP 8.1+**, **PSR-12**.
+Compatibility: **FacturaScripts 2025.7+**, **PHP 8.1+**, **PSR-12**.
 
 ## Golden rules
 

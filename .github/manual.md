@@ -9,7 +9,7 @@ Si eliges una fecha y hora futura, el email se guarda y lo entrega la **cola de 
 
 ## Requisitos
 
-- FacturaScripts **2025** o superior.
+- FacturaScripts **2025.7** o superior.
 - PHP **8.1** o superior.
 - **El cron / la cola de trabajos debe estar configurado y en ejecución.** Sin él, los emails
   programados quedan en estado *pendiente* y no se envían nunca.

@@ -6,4 +6,4 @@ Los emails programados se entregan reutilizando la infraestructura nativa de Fac
 
 Los adjuntos (el PDF del documento generado y los archivos que subas) se copian a una carpeta propia del plugin para que sigan disponibles aunque el email se programe para dentro de varios días. Cada email programado guarda su estado (pendiente, enviado, fallido o cancelado), y dispone de una pantalla de gestión donde puedes revisar y cancelar los envíos pendientes. El documento relacionado se marca como enviado solo después de la entrega correcta.
 
-Compatible con FacturaScripts 2025 y PHP 8.1 o superior. Requiere tener el cron / la cola de trabajos configurada y en ejecución para que los emails programados se entreguen.
+Compatible con FacturaScripts 2025.7 y PHP 8.1 o superior. Requiere tener el cron / la cola de trabajos configurada y en ejecución para que los emails programados se entreguen.
