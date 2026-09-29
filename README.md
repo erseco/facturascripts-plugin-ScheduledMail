@@ -33,7 +33,7 @@ El email programado se guarda, sus adjuntos se copian a una carpeta propia del p
 - **Pantalla de gestión** (*Emails programados*) con estados y opción de cancelar los pendientes.
 - **Reutiliza el núcleo**: `NewMail`, `WorkQueue` y el cron de FacturaScripts; no añade ni un
   mailer ni un cron propios.
-- **Compatibilidad**: FacturaScripts 2025 y PHP 8.1 o superior.
+- **Compatibilidad**: FacturaScripts 2025.7 y PHP 8.1 o superior.
 
 ## Uso
 
@@ -58,7 +58,7 @@ Puedes revisar y cancelar los envíos en **Panel de Admin > Emails programados**
 
 ## Requisitos
 
-- FacturaScripts **2025** o superior (usa `WorkQueue::sendFuture()`).
+- FacturaScripts **2025.7** o superior (usa los ganchos `pipe()` y `redirectAfter()` del controlador `SendMail`).
 - PHP **8.1** o superior.
 - **El cron / la cola de trabajos debe estar configurado y en ejecución.** Los emails
   programados los entrega la cola de trabajos, que procesa el cron. Si el cron no se ejecuta,
